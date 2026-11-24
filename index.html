@@ -24,8 +24,8 @@ nav{position:sticky;top:max(10px,env(safe-area-inset-top));z-index:20;margin:10p
 .links a{color:#fff;text-decoration:none;font-size:.86rem;padding:7px 12px;border-radius:999px;transition:background .25s}
 .links a:hover{background:rgba(47,123,255,.25)}
 .wrap{max-width:1100px;margin:auto;padding:0 20px}
-.banner{margin:22px auto 0;width:min(1100px,calc(100% - 24px))}
-.banner video{width:100%;aspect-ratio:4/1;object-fit:cover;border-radius:28px;display:block;pointer-events:none;background:linear-gradient(120deg,var(--blue2),#06122f)}
+.banner{margin:22px auto 0;width:min(720px,calc(100% - 24px))}
+.banner video{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:28px;display:block;pointer-events:none;background:linear-gradient(120deg,var(--blue2),#06122f)}
 #home{text-align:center;padding:46px 20px 10px;display:flex;flex-direction:column;align-items:center;gap:20px}
 .stage{position:relative;width:min(1000px,100%);padding:20px 0}
 h1{font-size:clamp(2.6rem,9vw,6rem);line-height:1.02;letter-spacing:-.03em;background:linear-gradient(90deg,#fff 10%,var(--ice) 50%,var(--blue) 95%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:url(#liquid);padding:6px 0;cursor:default}
@@ -187,6 +187,41 @@ h1{background:linear-gradient(90deg,#1a0f16 0,#e0125f 62%,#ff4f8b);-webkit-backg
 .scene{position:fixed;left:0;bottom:0;width:100%;height:min(36vh,330px);z-index:-1;pointer-events:none}
 body::after{content:"日本 · NIPPON";position:fixed;right:12px;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;font-weight:700;font-size:.85rem;letter-spacing:.55em;color:var(--blue2);opacity:.85;pointer-events:none;z-index:1}
 @media(max-width:1250px){body::after{display:none}}
+
+/* ===== MOBILE + ADMIN ===== */
+@media(max-width:700px){
+  .grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;justify-content:flex-start;gap:14px;padding:6px 20px 24px;margin:0 -20px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .grid::-webkit-scrollbar{display:none}
+  .grid .card{flex:0 0 58%;max-width:240px;scroll-snap-align:center}
+  .grid.long .card{flex:0 0 84%;max-width:360px}
+}
+#panel .lb{margin-top:12px;font-size:.82rem;font-weight:500}
+#panel .lb span{display:block}
+#panel h4{margin-top:24px;font-weight:700}
+#panel .it{background:#0f1730;border-radius:12px;padding:10px;margin-top:8px;display:grid;gap:6px}
+#panel .f{display:flex;gap:6px;align-items:center}
+#panel .f input{margin-top:0}
+#panel select{background:#060a16;color:#fff;border:1px solid #243055;border-radius:10px;padding:10px;font:inherit;font-size:.88rem}
+#panel .pv{width:38px;height:38px;border-radius:8px;object-fit:cover;flex:none}
+#panel .sticky{position:sticky;bottom:-20px;background:#0a0f1f;padding:12px 0}
+
+/* ===== RIBBON + MOBILE SPACING ===== */
+section.s{padding-left:20px;padding-right:20px}
+.banner{margin-top:34px}
+.rib{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:26px -20px 0;padding:0 20px;cursor:grab;-webkit-mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent);mask-image:linear-gradient(90deg,transparent,#000 5%,#000 95%,transparent)}
+.rib::-webkit-scrollbar{display:none}
+.rin{position:relative}
+.rin svg{position:absolute;left:0;top:0;overflow:visible}
+.node{position:absolute;width:72px;color:var(--ink);text-decoration:none;transition:transform .3s}
+.node .av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--blue2));overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 1.5px var(--ink),0 8px 20px rgba(0,0,0,.25);display:grid;place-items:center;color:#fff;font-weight:700;font-size:1.4rem}
+.node img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.node b{display:block;width:150px;margin:8px -39px 0;text-align:center;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node:hover{transform:translateY(-6px) scale(1.08)}
+@media(max-width:700px){
+  .grid{--cw:min(58vw,240px);width:100vw;margin:0 0 0 calc(50% - 50vw);padding:6px calc((100vw - var(--cw))/2) 24px}
+  .grid.long{--cw:min(84vw,360px)}
+  .grid .card,.grid.long .card{flex:0 0 var(--cw);max-width:none}
+}
 </style></head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="liquid" x="-5%" y="-25%" width="110%" height="150%"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="4" result="n"/><feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -197,7 +232,7 @@ body::after{content:"日本 · NIPPON";position:fixed;right:12px;top:50%;transfo
   <a class="btn dark sm" href="#contact" id="navCta"></a>
 </nav>
 
-<div class="banner"><video id="heroVid" autoplay muted loop playsinline disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noremoteplayback" tabindex="-1"></video></div>
+
 
 <header id="home">
   <div class="tools"><span><i>Pr</i>Premiere Pro</span><span><i>Ae</i>After Effects</span><span><i>Ps</i>Photoshop</span></div>
@@ -205,6 +240,8 @@ body::after{content:"日本 · NIPPON";position:fixed;right:12px;top:50%;transfo
   <p class="sub" id="sub"></p>
   <div class="btns"><a class="btn dark" href="#contact" id="ctaA"></a><a class="btn light" href="#work" id="ctaB"></a></div>
 </header>
+
+<div class="banner"><video id="heroVid" autoplay muted loop playsinline disablepictureinpicture disableremoteplayback controlslist="nodownload nofullscreen noremoteplayback" tabindex="-1"></video></div>
 
 <section class="s wrap" id="channels"><h2></h2><p class="sub"></p><div class="cards" id="chList"></div></section>
 
@@ -233,7 +270,6 @@ body::after{content:"日本 · NIPPON";position:fixed;right:12px;top:50%;transfo
 
 <script>
 /* ===== DEFAULT CONTENT (the Admin panel edits all of this) ===== */
-const ADMIN_PASSWORD="admin123";   // change this
 const DEF={
   name:"Your Name",logo:"logo.png",heroVideo:"hero.mp4",
   title:"Your Name",
@@ -261,8 +297,7 @@ let C=JSON.parse(JSON.stringify(DEF)),tab="short",lastHero="",ri=0,rt;
 const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
 
 async function init(){
-  try{const r=await fetch("content.json",{cache:"no-store"});if(r.ok)Object.assign(C,await r.json())}catch(e){}
-  try{const s=localStorage.getItem("pf_content");if(s)Object.assign(C,JSON.parse(s))}catch(e){}
+  for(const u of ["/api/content","content.json"]){try{const r=await fetch(u,{cache:"no-store"});if(r.ok){const d=await r.json();if(d&&d.name){Object.assign(C,d);break}}}catch(e){}}
   render();setTab(tab,false);checkAdmin();
 }
 const T=(id,k)=>{$(id).textContent=C[k]};
@@ -282,10 +317,7 @@ function render(){
   $("#fls").innerHTML=C.floaters.slice(0,4).map(()=>'<div class="fl glass"><b></b><span></span></div>').join("");
   document.querySelectorAll(".fl").forEach((el,i)=>{el.querySelector("span").textContent=C.floaters[i].label;count(el.querySelector("b"),C.floaters[i].value)});
   sec("channels",C.channels,"chTitle","chSub");
-  $("#chList").innerHTML=C.channels.map(c=>`<a class="ch glass pad" href="${esc(c.link)}" target="_blank" rel="noopener"><div class="av">${c.img?`<img alt="" src="${esc(c.img)}">`:""}</div><b>${esc(c.name)}</b><br><small>${esc(c.subs)}</small><em data-h="Click to visit channel" data-t="Tap again to visit channel"></em></a>`).join("");
-  document.querySelectorAll(".ch").forEach(a=>a.addEventListener("click",e=>{
-    if(matchMedia("(hover:none)").matches&&!a.classList.contains("armed")){e.preventDefault();document.querySelectorAll(".ch").forEach(x=>x.classList.remove("armed"));a.classList.add("armed")}
-  }));
+  ribbon();
   T("#workTitle","workTitle");T("#workSub","workSub");
   build(C.shorts,$("#gridShort"),true);build(C.long,$("#gridLong"),false);
   sec("results",C.results,"resTitle","resSub");
@@ -300,6 +332,33 @@ function render(){
   $("#chan").innerHTML=[["Email","mailto:"+C.email],["Instagram",C.instagram]].map(c=>`<a href="${esc(c[1])}" target="_blank" rel="noopener">${c[0]}</a>`).join("");
   $("#about").innerHTML=C.about.map(a=>`<div><span>${esc(a.label)}</span><b>${esc(a.value)}</b></div>`).join("");
 }
+let lastW=0;
+function ribbon(){
+  const box=$("#chList"),L=C.channels,n=L.length;box.className="rib";lastW=innerWidth;
+  const W=Math.max(innerWidth-40,n*190+120),H=250,cy=120,e=Math.min(130,W*.2);
+  const y=x=>cy+44*Math.sin(x/95)+14*Math.sin(x/37+1);
+  const path=(a,b)=>{let d="";for(let x=a;x<=b;x+=6)d+=(d?"L":"M")+x+","+y(x).toFixed(1);return d};
+  const seg=(a,b,c)=>`<path d="${path(a,b)}" fill="none" stroke="${c}" stroke-width="20" stroke-linecap="butt" stroke-linejoin="round"/>`;
+  const X=i=>n>1?80+i*((W-160)/(n-1)):W/2;
+  const sq=(x,yy)=>`<rect x="${x}" y="${yy}" width="5" height="5" fill="#fff" opacity=".9"/>`;
+  const patch=x=>{const a=(Math.atan2(y(x+2)-y(x-2),4)*180/Math.PI).toFixed(1);return `<g transform="translate(${x} ${y(x).toFixed(1)}) rotate(${a})"><rect x="-36" y="-12" width="72" height="24" rx="2" fill="#6f8fe0"/><rect x="-11" y="-12" width="22" height="24" fill="#e8231f"/><path d="M-6,4 C-6,-8 4,-8 3,-1 C2,5 -4,3 -1,-3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>${[-31,-24,-17,13,20,27].map(k=>sq(k,-9)+sq(k,4)).join("")}</g>`};
+  const fringe=(x,s)=>{const cols=["#f23a2a","#ffa81c","#3cb878","#4a86e8","#f7d33a","#f23a2a","#ff8fb3"];return `<g transform="translate(${x} ${y(x).toFixed(1)})"><rect x="${s<0?-6:-2}" y="-11" width="8" height="22" rx="3" fill="#c92a1d"/>${cols.map((c,i)=>{const a=(i-3)*9*Math.PI/180,l=24+(i%3)*4;return `<path d="M${s*4},${((i-3)*2.4).toFixed(1)} l${(s*Math.cos(a)*l).toFixed(1)},${(Math.sin(a)*l).toFixed(1)}" stroke="${c}" stroke-width="3" stroke-linecap="round"/>`}).join("")}</g>`};
+  let svg=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">`;
+  svg+=`<path d="${path(16,W-16)}" fill="none" stroke="rgba(120,20,20,.25)" stroke-width="24" transform="translate(0,3)"/>`+seg(16,e,"#f23a2a")+seg(e,W-e,"#ffa81c")+seg(W-e,W-16,"#f23a2a")+`<path d="${path(16,W-16)}" fill="none" stroke="rgba(255,255,255,.35)" stroke-width="3" transform="translate(0,-5)"/>`;
+  for(let i=0;i<n-1;i++)svg+=patch((X(i)+X(i+1))/2);
+  if(n<2)svg+=patch(W/2+120);
+  svg+=fringe(16,-1)+fringe(W-16,1)+"</svg>";
+  const nodes=L.map((c,i)=>{const x=X(i);return `<a class="node" href="${esc(c.link)}" target="_blank" rel="noopener" title="${esc(c.subs)}" style="left:${x-36}px;top:${(y(x)-36).toFixed(1)}px"><div class="av">${c.img?`<img alt="" src="${esc(c.img)}">`:esc((c.name||"?").charAt(0))}</div><b>${esc(c.name)}</b></a>`}).join("");
+  box.innerHTML=`<div class="rin" style="width:${W}px;height:${H}px">${svg}${nodes}</div>`;
+}
+(function(){
+  const b=$("#chList");let d=0,sx=0,sl=0,mv=0,rz;
+  b.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse")return;d=1;mv=0;sx=e.clientX;sl=b.scrollLeft;b.style.cursor="grabbing"});
+  addEventListener("pointermove",e=>{if(d){mv=Math.abs(e.clientX-sx);b.scrollLeft=sl-(e.clientX-sx)}});
+  addEventListener("pointerup",()=>{d=0;b.style.cursor=""});
+  b.addEventListener("click",e=>{if(mv>5){e.preventDefault();mv=0}},true);
+  addEventListener("resize",()=>{clearTimeout(rz);rz=setTimeout(()=>{if(innerWidth!==lastW&&!$("#channels").hidden)ribbon()},200)});
+})();
 function showReview(i,now){
   if(!C.reviews.length)return;ri=i;const r=C.reviews[i],m=$("#rvMain");
   const fill=()=>{m.innerHTML=`<div class="star">★★★★★</div><q>“${esc(r.quote)}”</q><div class="who"><div class="pf">${r.img?`<img alt="" src="${esc(r.img)}">`:esc((r.name||"?").charAt(0))}</div><div><b>${esc(r.name)}</b><small>${esc(r.role)}</small></div></div>`;m.classList.remove("sw")};
@@ -358,33 +417,70 @@ if(!reduce){
 }
 
 /* ===== ADMIN PANEL ===== */
-const TEXT=[["name","Your name"],["logo","Logo file","e.g. logo.png"],["heroVideo","Top banner video (4:1)","e.g. hero.mp4"],["title","Main headline"],["sub","Intro text"],["ctaA","Button 1 text"],["ctaB","Button 2 text"],["navCta","Top bar button text"],["chTitle","Channels title"],["chSub","Channels text"],["workTitle","Work title"],["workSub","Work text"],["resTitle","Results title"],["resSub","Results text"],["rvTitle","Reviews title"],["rvSub","Reviews text"],["ratingValue","Average rating number"],["ratingClients","Happy clients number"],["cTitle","Contact title"],["cSub","Contact text"],["cLabel","Contact button text"],["cLink","Contact button link","Any link: WhatsApp, Telegram, form…"],["email","Email"],["instagram","Instagram link"]];
+let PW="";
+const TEXT=[["name","Your name"],["logo","Logo","image"],["heroVideo","Top video (4:3, always plays)","video"],["title","Main headline"],["sub","Intro text"],["ctaA","Button 1 text"],["ctaB","Button 2 text"],["navCta","Top bar button text"],["chTitle","Channels title"],["chSub","Channels text"],["workTitle","Work title"],["workSub","Work text"],["resTitle","Results title"],["resSub","Results text"],["rvTitle","Reviews title"],["rvSub","Reviews text"],["ratingValue","Average rating number"],["ratingClients","Happy clients number"],["cTitle","Contact title"],["cSub","Contact text"],["cLabel","Contact button text"],["cLink","Contact button link"],["email","Email"],["instagram","Instagram link"]];
 const LISTS={
-  floaters:["Floating numbers (max 4)","value | label   e.g. 731.5K+ | Total views",["value","label"]],
-  shorts:["Short videos","title | file | videos/short1.mp4   (or: title | youtube | VIDEO_ID)",["title","type","src"]],
-  long:["Long videos","same format as short videos",["title","type","src"]],
-  channels:["Worked with","name | subscribers | channel link | image file",["name","subs","link","img"]],
-  results:["Results","value | title | text",["value","title","text"]],
-  reviews:["Reviews","quote | name | role | image file (optional)",["quote","name","role","img"]],
-  about:["About / details","label | value",["label","value"]]
+  floaters:["Floating numbers (max 4)","Big number + label, e.g. 731.5K+ and Total views",["value","label"]],
+  shorts:["Short videos","Pick Uploaded for a video you upload, or YouTube ID for a YouTube link",["title","type","src"]],
+  long:["Long videos","Same as short videos",["title","type","src"]],
+  channels:["Worked with (channels)","Upload each channel's logo",["name","subs","link","img"]],
+  results:["Results","",["value","title","text"]],
+  reviews:["Reviews","Photo is optional",["quote","name","role","img"]],
+  about:["About / details","",["label","value"]]
 };
-const toText=k=>C[k].map(o=>LISTS[k][2].map(f=>o[f]||"").join(" | ")).join("\n");
-const fromText=(k,t)=>{const F=LISTS[k][2];return t.split("\n").map(l=>l.split("|").map(s=>s.trim())).filter(p=>p[0]).map(p=>{const o={};F.forEach((f,i)=>o[f]=i===F.length-1?p.slice(i).join(" | "):(p[i]||""));return o})};
-function checkAdmin(){if(location.hash!=="#admin")return;if(prompt("Admin password")===ADMIN_PASSWORD)openAdmin();else location.hash=""}
-addEventListener("hashchange",checkAdmin);
+const UPLOAD={shorts:{src:"video/*"},long:{src:"video/*"},channels:{img:"image/*"},reviews:{img:"image/*"}};
+const refresh=()=>{render();setTab(tab,false)};
+function row(k,i,o){return `<div class="it" data-k="${k}" data-i="${i}">`+LISTS[k][2].map(f=>{
+  if(f==="type")return `<select data-f="type"><option value="file"${o.type==="youtube"?"":" selected"}>Uploaded / file video</option><option value="youtube"${o.type==="youtube"?" selected":""}>YouTube ID</option></select>`;
+  const u=(UPLOAD[k]||{})[f];
+  return `<div class="f">${u&&u.startsWith("image")&&o[f]?`<img class="pv" alt="" src="${esc(o[f])}">`:""}<input data-f="${f}" placeholder="${f}" value="${esc(o[f])}">${u?`<button class="btn light sm" data-up="${u}">Upload</button>`:""}</div>`}).join("")+`<button class="btn light sm" data-del>Remove</button></div>`}
 function openAdmin(){
-  const p=$("#panel");
-  p.innerHTML=`<h3>Site manager</h3><p class="n">Edit, press Apply to preview here, then Download content.json and upload it to GitHub to publish for everyone. Leave a list empty to hide its section.</p>`+
-    TEXT.map(t=>`<label>${t[1]}${t[2]?`<small>${t[2]}</small>`:""}<input data-k="${t[0]}" value="${esc(C[t[0]])}"></label>`).join("")+
-    Object.keys(LISTS).map(k=>`<label>${LISTS[k][0]}<small>One per line: ${LISTS[k][1]}</small><textarea data-l="${k}" wrap="off">${esc(toText(k))}</textarea></label>`).join("")+
-    `<div class="row"><button class="btn dark sm" id="aApply">Apply</button><button class="btn light sm" id="aDl">Download content.json</button><button class="btn light sm" id="aReset">Reset my preview</button><button class="btn light sm" id="aClose">Close</button></div>`;
+  $("#panel").innerHTML=`<h3>Site manager</h3><p class="n">Change anything, then press Save to website. It goes live for everyone with no GitHub step. Empty lists hide their section.</p><h4>Basics</h4>`+
+    TEXT.map(t=>`<div class="lb"><span>${t[1]}</span><div class="f"><input data-t="${t[0]}" value="${esc(C[t[0]])}">${t[2]?`<button class="btn light sm" data-up="${t[2]}/*">Upload</button>`:""}</div></div>`).join("")+
+    Object.keys(LISTS).map(k=>`<h4>${LISTS[k][0]}</h4><p class="n">${LISTS[k][1]}</p>${C[k].map((o,i)=>row(k,i,o)).join("")}<button class="btn light sm" data-add="${k}" style="margin-top:8px">+ Add</button>`).join("")+
+    `<div class="row sticky"><button class="btn dark sm" data-save>Save to website</button><button class="btn light sm" data-dl>Download backup</button><button class="btn light sm" data-close>Close</button></div>`;
   $("#admin").classList.add("open");
-  const read=()=>{p.querySelectorAll("[data-k]").forEach(i=>C[i.dataset.k]=i.value);p.querySelectorAll("[data-l]").forEach(i=>C[i.dataset.l]=fromText(i.dataset.l,i.value))};
-  $("#aApply").onclick=()=>{read();try{localStorage.setItem("pf_content",JSON.stringify(C))}catch(e){}render();setTab(tab,false)};
-  $("#aDl").onclick=()=>{read();const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(C,null,2)],{type:"application/json"}));a.download="content.json";a.click()};
-  $("#aReset").onclick=()=>{try{localStorage.removeItem("pf_content")}catch(e){}location.hash="";location.reload()};
-  $("#aClose").onclick=()=>{$("#admin").classList.remove("open");location.hash=""};
 }
+function reopen(){const p=$("#panel"),st=p.scrollTop;openAdmin();p.scrollTop=st}
+async function uploadFile(f){
+  const {upload}=await import("https://esm.sh/@vercel/blob@0.27.0/client");
+  const b=await upload("uploads/"+f.name,f,{access:"public",handleUploadUrl:"/api/upload",clientPayload:PW});
+  return b.url;
+}
+async function save(){
+  if(location.protocol==="file:"){alert("Open your live site to save.");return}
+  const r=await fetch("/api/content",{method:"POST",headers:{"content-type":"application/json","x-admin-password":PW},body:JSON.stringify(C)}).catch(()=>null);
+  alert(r&&r.ok?"Saved. Your site is updated (may take up to a minute to show for visitors).":"Save failed. Check the Vercel setup steps.");
+}
+$("#panel").addEventListener("change",e=>{
+  const t=e.target,it=t.closest(".it");
+  if(it&&t.dataset.f){C[it.dataset.k][+it.dataset.i][t.dataset.f]=t.value;refresh()}
+  else if(t.dataset.t){C[t.dataset.t]=t.value;refresh()}
+});
+$("#panel").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;const it=b.closest(".it");
+  if(b.hasAttribute("data-del")){C[it.dataset.k].splice(+it.dataset.i,1);refresh();reopen()}
+  else if(b.dataset.add){const k=b.dataset.add;C[k].push(Object.fromEntries(LISTS[k][2].map(f=>[f,f==="type"?"file":""])));refresh();reopen()}
+  else if(b.dataset.up){
+    const inp=document.createElement("input");inp.type="file";inp.accept=b.dataset.up;
+    inp.onchange=async()=>{const f=inp.files[0];if(!f)return;const old=b.textContent;b.textContent="Uploading…";b.disabled=true;
+      try{const url=await uploadFile(f);const box=b.previousElementSibling;box.value=url;box.dispatchEvent(new Event("change",{bubbles:true}));reopen()}
+      catch(err){alert("Upload failed: "+(err.message||err));b.textContent=old;b.disabled=false}};
+    inp.click();
+  }
+  else if(b.hasAttribute("data-save"))save();
+  else if(b.hasAttribute("data-dl")){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(C,null,2)],{type:"application/json"}));a.download="content-backup.json";a.click()}
+  else if(b.hasAttribute("data-close")){$("#admin").classList.remove("open");location.hash=""}
+});
+async function checkAdmin(){
+  if(location.hash!=="#admin")return;
+  if(location.protocol==="file:"){openAdmin();return}
+  const p=prompt("Admin password");if(!p){location.hash="";return}
+  const r=await fetch("/api/content",{method:"POST",headers:{"content-type":"application/json","x-admin-password":p},body:JSON.stringify({verify:true})}).catch(()=>null);
+  if(r&&r.ok){PW=p;openAdmin()}
+  else{alert(r&&r.status===401?"Wrong password.":"Admin is not set up yet. Follow the Vercel setup steps.");location.hash=""}
+}
+addEventListener("hashchange",checkAdmin);
 init();
 </script>
 
@@ -410,9 +506,9 @@ init();
   const cv=document.getElementById("petals"),cx=cv.getContext("2d");let w,h;
   function size(){const d=Math.min(2,devicePixelRatio||1);w=innerWidth;h=innerHeight;cv.width=w*d;cv.height=h*d;cx.setTransform(d,0,0,d,0,0)}
   size();addEventListener("resize",size);
-  const mk=init=>({x:Math.random()*w,y:init?Math.random()*h:-20,s:6+Math.random()*8,vy:.5+Math.random()*1,sw:Math.random()*6.28,sp:.01+Math.random()*.02,r:Math.random()*6.28,vr:(Math.random()-.5)*.04,a:.55+Math.random()*.4});
+  const mk=init=>({x:Math.random()*w,y:init?Math.random()*h:-20,s:(6+Math.random()*8)*(w<600?.45:1),vy:.5+Math.random()*1,sw:Math.random()*6.28,sp:.01+Math.random()*.02,r:Math.random()*6.28,vr:(Math.random()-.5)*.04,a:.55+Math.random()*.4});
   const ps=Array.from({length:innerWidth<600?26:46},()=>mk(true));
-  addEventListener('pointerdown',e=>{if(ps.length>140)return;for(let i=0;i<14;i++){const p=mk(false);p.b=true;p.x=e.clientX;p.y=e.clientY;p.vy=-1.5-Math.random()*3.5;p.sw=Math.random()*6;p.s=5+Math.random()*7;p.a=.95;ps.push(p)}});
+  addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('a,button,summary');if(!t||t.closest('#admin')||ps.length>140)return;const r=t.getBoundingClientRect();for(let i=0;i<14;i++){const p=mk(false);p.b=true;p.x=r.left+r.width/2+(Math.random()-.5)*r.width*.6;p.y=r.top+r.height/2;p.vy=-1.5-Math.random()*3.5;p.sw=Math.random()*6;p.s=(5+Math.random()*6)*(w<600?.5:1);p.a=.95;ps.push(p)}});
   function draw(move){
     cx.clearRect(0,0,w,h);
     ps.forEach(p=>{

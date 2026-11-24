@@ -1,0 +1,133 @@
+{
+  "name": "OXIDE fx",
+  "logo": "logo.png",
+  "heroVideo": "hero.mp4",
+  "title": "OXIDE",
+  "sub": "I’m a freelance video editor creating engaging, story-driven videos for creators and brands.",
+  "ctaA": "Start A Project",
+  "ctaB": "See The Work",
+  "navCta": "Let’s Talk",
+  "floaters": [
+    {
+      "value": "731.5K+",
+      "label": "Total views"
+    },
+    {
+      "value": "10.3%",
+      "label": "Avg CTR"
+    },
+    {
+      "value": "20+",
+      "label": "Happy clients"
+    }
+  ],
+  "chTitle": "Worked With",
+  "chSub": "Channels I’ve edited videos for.",
+  "channels": [
+    {
+      "name": "Channel one",
+      "subs": "100K subscribers",
+      "link": "https://youtube.com",
+      "img": ""
+    },
+    {
+      "name": "Channel two",
+      "subs": "50K subscribers",
+      "link": "https://youtube.com",
+      "img": ""
+    }
+  ],
+  "workTitle": "Featured Work",
+  "workSub": "Hover to preview, tap to watch.",
+  "shorts": [
+    {
+      "title": "Short 1",
+      "type": "file",
+      "src": "videos/short1.mp4"
+    },
+    {
+      "title": "Short 2",
+      "type": "file",
+      "src": "videos/short2.mp4"
+    },
+    {
+      "title": "Short 3",
+      "type": "file",
+      "src": "videos/short3.mp4"
+    }
+  ],
+  "long": [
+    {
+      "title": "Long video 1",
+      "type": "youtube",
+      "src": "YOUTUBE_ID"
+    },
+    {
+      "title": "Long video 2",
+      "type": "file",
+      "src": "videos/long2.mp4"
+    }
+  ],
+  "resTitle": "Real Results",
+  "resSub": "What good editing does for a Channel.",
+  "results": [
+    {
+      "value": "12%",
+      "title": "Average CTR",
+      "text": "Higher click-through from strong packaging."
+    },
+    {
+      "value": "+35%",
+      "title": "Retention boost",
+      "text": "Longer watch time from pacing and storytelling."
+    }
+  ],
+  "rvTitle": "What Clients Say",
+  "rvSub": "Real feedback from creators I’ve worked with.",
+  "ratingValue": "4.5",
+  "ratingClients": "20+",
+  "reviews": [
+    {
+      "quote": "Great work and always on time.",
+      "name": "Client name",
+      "role": "YouTuber",
+      "img": ""
+    },
+    {
+      "quote": "Super clean edits, would work again.",
+      "name": "Client two",
+      "role": "Agency manager",
+      "img": ""
+    },
+    {
+      "quote": "Awesome editor.",
+      "name": "FearNito",
+      "role": "YouTuber",
+      "img": ""
+    }
+  ],
+  "cTitle": "Start A Project",
+  "cSub": "Tell me about your Content and Goals.",
+  "cLabel": "Contact Me",
+  "cLink": "",
+  "email": "oxidefx834@gmail.com",
+  "instagram": "https://www.instagram.com/oxide.fx/?hl=en",
+  "about": [
+    {
+      "label": "Based in",
+      "value": "India"
+    },
+    {
+      "label": "Software",
+      "value": "Premiere Pro, After Effects, Photoshop"
+    },
+    {
+      "label": "Languages",
+      "value": "English, Hindi, Bengali"
+    },
+    {
+      "label": "Turnaround",
+      "value": "2 days"
+    }
+  ]
+}

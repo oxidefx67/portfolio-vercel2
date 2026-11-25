@@ -392,6 +392,24 @@ h1{position:relative;z-index:1;background:linear-gradient(90deg,#c0001f 0%,#8f00
   .fl b{font-size:1.05rem}
   .fl span{font-size:.62rem}
 }
+
+/* ===== BRIGHT RED NAME (palette-controlled) + RED STATS/TOOLS + MOBILE TOP BAR NAME ===== */
+h1{background:var(--nameC,#ff1f3d);-webkit-background-clip:text;background-clip:text;filter:url(#liquid) drop-shadow(0 0 16px var(--nameGlow,rgba(255,31,61,.45)))}
+.tools,.tools span{color:var(--accC,#ff1f3d)}
+.tools i{color:var(--accC,#ff1f3d)}
+.fl b,.fl span{color:var(--accC,#ff1f3d)}
+.brand{min-width:0;flex:1 1 auto}
+.brand .n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#navCta{flex:none;white-space:nowrap}
+@media(max-width:560px){
+  .brand .n{display:block;font-size:.95rem}
+  nav{gap:8px;padding:8px 8px 8px 12px}
+  #navCta.btn.sm{padding:8px 14px;font-size:.8rem}
+}
+#panel .pal{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+#panel .sw{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.35);padding:0;cursor:pointer}
+#panel .sw.on{outline:2px solid #fff;outline-offset:2px}
+#panel input[type=color]{width:56px;height:34px;padding:2px;margin-top:0;flex:none;cursor:pointer}
 </style></head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="liquid" x="-5%" y="-25%" width="110%" height="150%"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="4" result="n"/><feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -478,7 +496,7 @@ function count(el,txt){
   (function f(t){const k=Math.min(1,(t-t0)/1400),e=1-Math.pow(1-k,3);el.textContent=pre+(n*e).toFixed(d)+post;if(k<1)requestAnimationFrame(f)})(t0);
 }
 function render(){
-  document.title=C.name+" | Video Editor";
+  document.title=C.name+" | Video Editor";applyColors();
   T("#navName","name");T("#navCta","navCta");T("#title","title");T("#sub","sub");T("#ctaA","ctaA");T("#ctaB","ctaB");
   $("#foot").textContent="© "+new Date().getFullYear()+" "+C.name;
   const slot=$("#logoSlot");slot.innerHTML='<span class="fb">'+esc(C.name.charAt(0))+"</span>";
@@ -614,6 +632,17 @@ function vrow(k,i,o){
 }
 const shp=()=>{const x=C.logoShape;return !x||x==="original"?"auto":x};
 
+/* ===== COLOR PALETTE (admin) ===== */
+const SW=["#ff1f3d","#ff4d4d","#ff7a1a","#ffc94d","#ff5fa2","#ffffff","#34d6ff","#8a5bff"];
+const hexOk=x=>/^#[0-9a-f]{6}$/i.test(x||"");
+const colorSel=t=>{const v=hexOk(C[t[0]])?C[t[0]]:"#ff1f3d";return `<div class="lb"><span>${t[1]}</span><div class="pal" data-key="${t[0]}">${SW.map(c=>`<button type="button" class="sw${c===v.toLowerCase()?" on":""}" data-color="${c}" style="background:${c}" aria-label="${c}"></button>`).join("")}<input type="color" data-t="${t[0]}" value="${v}" title="Pick any color"></div></div>`};
+function applyColors(){
+  const r=document.documentElement.style,n=hexOk(C.nameColor)?C.nameColor:"#ff1f3d",a=hexOk(C.accentColor)?C.accentColor:"#ff1f3d";
+  const rgb=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16)).join(",");
+  r.setProperty("--nameC",n);r.setProperty("--nameGlow","rgba("+rgb(n)+",.45)");r.setProperty("--accC",a);
+}
+$("#panel").addEventListener("input",e=>{const t=e.target;if(t.type==="color"&&t.dataset.t){C[t.dataset.t]=t.value;applyColors()}});
+
 /* ===== LIQUID TYPE EFFECT on the headline ===== */
 if(!reduce){
   const turb=$("#turb"),disp=$("#disp"),h=$("#title"),touch=matchMedia("(hover:none)").matches,base=touch?3:4,hot=touch?12:46,press=touch?18:70;let cur=base,target=base,t=0;
@@ -627,7 +656,7 @@ if(!reduce){
 
 /* ===== ADMIN PANEL ===== */
 let PW="";
-const TEXT=[["name","Your name"],["logo","Logo","image"],["logoShape","Logo shape","shape"],["heroVideo","Top video (4:3, always plays)","video"],["title","Main headline"],["sub","Intro text"],["ctaA","Button 1 text"],["ctaB","Button 2 text"],["navCta","Top bar button text"],["chTitle","Channels title"],["chSub","Channels text"],["workTitle","Work title"],["workSub","Work text"],["resTitle","Results title"],["resSub","Results text"],["rvTitle","Reviews title"],["rvSub","Reviews text"],["ratingValue","Average rating number"],["ratingClients","Happy clients number"],["cTitle","Contact title"],["cSub","Contact text"],["cLabel","Contact button text"],["cLink","Contact button link"],["email","Email"],["instagram","Instagram link"]];
+const TEXT=[["name","Your name"],["logo","Logo","image"],["logoShape","Logo shape","shape"],["heroVideo","Top video (4:3, always plays)","video"],["title","Main headline"],["nameColor","Name color (headline)","color"],["accentColor","Stats & tools color (Pr/Ae/Ps, views, CTR)","color"],["sub","Intro text"],["ctaA","Button 1 text"],["ctaB","Button 2 text"],["navCta","Top bar button text"],["chTitle","Channels title"],["chSub","Channels text"],["workTitle","Work title"],["workSub","Work text"],["resTitle","Results title"],["resSub","Results text"],["rvTitle","Reviews title"],["rvSub","Reviews text"],["ratingValue","Average rating number"],["ratingClients","Happy clients number"],["cTitle","Contact title"],["cSub","Contact text"],["cLabel","Contact button text"],["cLink","Contact button link"],["email","Email"],["instagram","Instagram link"]];
 const LISTS={
   floaters:["Floating numbers (max 4)","Big number + label, e.g. 731.5K+ and Total views",["value","label"]],
   shorts:["Short videos","Upload a video file, or paste a link (YouTube, Instagram, TikTok, Facebook, Vimeo, Google Drive, Loom…)",["title","type","src"]],
@@ -647,7 +676,7 @@ function row(k,i,o){if(k==="shorts"||k==="long")return vrow(k,i,o);return `<div 
   return `<div class="f">${u&&u.startsWith("image")&&o[f]?`<img class="pv" alt="" src="${esc(o[f])}">`:""}<input data-f="${f}" placeholder="${f==="src"&&u?"Paste a YouTube link, or tap Upload":f}" value="${esc(f==="src"&&o.type==="youtube"?"https://youtu.be/"+o.src:o[f])}">${u?`<button class="btn light sm" data-up="${u}">Upload</button>`:""}</div>`}).join("")+`<button class="btn light sm" data-del>Remove</button></div>`}
 function openAdmin(){
   $("#panel").innerHTML=`<h3>Site manager</h3><p class="n">Change anything, then press Save to website. It goes live for everyone with no GitHub step. Empty lists hide their section.</p><h4>Basics</h4>`+
-    TEXT.map(t=>t[2]==="shape"?shapeSel(t):`<div class="lb"><span>${t[1]}</span><div class="f"><input data-t="${t[0]}" value="${esc(C[t[0]])}">${t[2]?`<button class="btn light sm" data-up="${t[2]}/*">Upload</button>`:""}</div></div>`).join("")+
+    TEXT.map(t=>t[2]==="shape"?shapeSel(t):t[2]==="color"?colorSel(t):`<div class="lb"><span>${t[1]}</span><div class="f"><input data-t="${t[0]}" value="${esc(C[t[0]])}">${t[2]?`<button class="btn light sm" data-up="${t[2]}/*">Upload</button>`:""}</div></div>`).join("")+
     Object.keys(LISTS).map(k=>`<h4>${LISTS[k][0]}</h4><p class="n">${LISTS[k][1]}</p>${C[k].map((o,i)=>row(k,i,o)).join("")}<button class="btn light sm" data-add="${k}" style="margin-top:8px">+ Add</button>`).join("")+
     `<div class="row sticky"><button class="btn dark sm" data-save>Save to website</button><button class="btn light sm" data-dl>Download backup</button><button class="btn light sm" data-close>Close</button></div>`;
   $("#admin").classList.add("open");
@@ -693,6 +722,7 @@ $("#panel").addEventListener("click",e=>{
       catch(err){alert("Upload failed: "+(err.message||err));b.textContent=old;b.disabled=false}};
     inp.click();
   }
+  else if(b.dataset.color){C[b.closest(".pal").dataset.key]=b.dataset.color;applyColors();reopen()}
   else if(b.hasAttribute("data-save"))save();
   else if(b.hasAttribute("data-dl")){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(C,null,2)],{type:"application/json"}));a.download="content-backup.json";a.click()}
   else if(b.hasAttribute("data-close")){$("#admin").classList.remove("open");location.hash=""}

@@ -410,6 +410,10 @@ h1{background:var(--nameC,#ff1f3d);-webkit-background-clip:text;background-clip:
 #panel .sw{width:30px;height:30px;border-radius:50%;border:2px solid rgba(255,255,255,.35);padding:0;cursor:pointer}
 #panel .sw.on{outline:2px solid #fff;outline-offset:2px}
 #panel input[type=color]{width:56px;height:34px;padding:2px;margin-top:0;flex:none;cursor:pointer}
+
+/* per-video CTR */
+.vctr{margin-top:10px;text-align:center;font-size:.85rem;color:var(--mute)}
+.vctr b{color:var(--accC,#ff1f3d);font-weight:700}
 </style></head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="liquid" x="-5%" y="-25%" width="110%" height="150%"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="4" result="n"/><feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
@@ -503,13 +507,13 @@ function render(){
   const im=new Image();im.alt="";im.src=C.logo;const sh=shp();im.className="lg "+sh;slot.className=sh;im.onload=()=>{slot.innerHTML="";slot.appendChild(im)};
   const hv=$("#heroVid");if(lastHero!==C.heroVideo){hv.src=C.heroVideo;lastHero=C.heroVideo;hv.muted=true;hv.play().catch(()=>{})}
   $("#fls").innerHTML=C.floaters.slice(0,4).map(()=>'<div class="fl glass"><b></b><span></span></div>').join("");
-  document.querySelectorAll(".fl").forEach((el,i)=>{el.querySelector("span").textContent=C.floaters[i].label;count(el.querySelector("b"),C.floaters[i].value)});
+  document.querySelectorAll(".fl").forEach((el,i)=>{const f=C.floaters[i],a=avgCtr();el.querySelector("span").textContent=f.label;count(el.querySelector("b"),/ctr/i.test(f.label)&&a!==null?fmtCtr(a,1):f.value)});
   sec("channels",C.channels,"chTitle","chSub");
   ribbon();
   T("#workTitle","workTitle");T("#workSub","workSub");
   build(C.shorts,$("#gridShort"),true);build(C.long,$("#gridLong"),false);
   sec("results",C.results,"resTitle","resSub");
-  $("#resList").innerHTML=C.results.map(r=>`<div class="res glass pad"><b>${esc(r.value)}</b><strong>${esc(r.title)}</strong><p>${esc(r.text)}</p></div>`).join("");
+  $("#resList").innerHTML=C.results.map(r=>`<div class="res glass pad"><b>${esc(/(avg|average)\s*ctr/i.test(r.title)&&avgCtr()!==null?fmtCtr(avgCtr(),1):r.value)}</b><strong>${esc(r.title)}</strong><p>${esc(r.text)}</p></div>`).join("");
   sec("reviews",C.reviews,"rvTitle","rvSub");
   $("#rAvg").textContent=C.ratingValue;$("#rCl").textContent=C.ratingClients;
   $("#rvAv").innerHTML=C.reviews.map((r,i)=>`<button data-i="${i}" aria-label="${esc(r.name)}">${r.img?`<img alt="" src="${esc(r.img)}">`:esc((r.name||"?").charAt(0))}</button>`).join("");
@@ -562,7 +566,7 @@ function build(list,el,vert){
     const m=info.thumb?`<img loading="lazy" alt="" src="${esc(info.thumb)}">`
       :info.file&&info.url?`<video muted loop playsinline preload="metadata" src="${esc(info.url)}#t=0.5"></video>`
       :`<div class="ph"><span>${esc(info.url?(PLAT[info.plat]||"Link"):"No video yet")}</span></div>`;
-    c.innerHTML=`<div class="thumb">${m}<div class="play">▶</div><div class="cap">${esc(v.title)}</div></div>`;
+    const cn=ctrNum(v.ctr);c.innerHTML=`<div class="thumb">${m}<div class="play">▶</div><div class="cap">${esc(v.title)}</div></div>${cn!==null?`<div class="vctr"><span>CTR</span> <b>${fmtCtr(cn,2)}</b></div>`:""}`;
     const vid=c.querySelector("video");
     if(vid){c.onmouseenter=()=>vid.play().catch(()=>{});c.onmouseleave=()=>{vid.pause();vid.currentTime=.5}}
     c.onclick=()=>openVideo(v,vert);el.appendChild(c);
@@ -628,8 +632,11 @@ const vstatus=o=>{
 };
 function vrow(k,i,o){
   const lv=o.type==="youtube"?"https://youtu.be/"+o.src:o.type==="link"?o.src:"";
-  return `<div class="it" data-k="${k}" data-i="${i}"><div class="f"><input data-f="title" placeholder="Video title" value="${esc(o.title)}"></div><div class="vsrc"><button class="btn light sm" data-upv>⬆ Upload video file</button><span class="or">or paste a link</span><div class="f"><input data-f="link" inputmode="url" placeholder="YouTube, Instagram, TikTok, Facebook, Vimeo link…" value="${esc(lv)}"></div></div><small class="vst">${esc(vstatus(o))}</small><button class="btn light sm" data-del>Remove</button></div>`;
+  return `<div class="it" data-k="${k}" data-i="${i}"><div class="f"><input data-f="title" placeholder="Video title" value="${esc(o.title)}"></div><div class="vsrc"><button class="btn light sm" data-upv>⬆ Upload video file</button><span class="or">or paste a link</span><div class="f"><input data-f="link" inputmode="url" placeholder="YouTube, Instagram, TikTok, Facebook, Vimeo link…" value="${esc(lv)}"></div></div><div class="f"><input data-f="ctr" inputmode="decimal" placeholder="CTR % for this video (e.g. 10.3)" value="${esc(o.ctr)}"></div><small class="vst">${esc(vstatus(o))}</small><button class="btn light sm" data-del>Remove</button></div>`;
 }
+const ctrNum=v=>{const t=String(v==null?"":v).trim();if(!t)return null;const n=parseFloat(t.replace(",",".").replace(/[^\d.]/g,""));return isFinite(n)?n:null};
+const fmtCtr=(n,d)=>(+n.toFixed(d)).toString()+"%";
+function avgCtr(){const a=[...C.shorts,...C.long].map(v=>ctrNum(v.ctr)).filter(x=>x!==null);return a.length?a.reduce((p,q)=>p+q,0)/a.length:null}
 const shp=()=>{const x=C.logoShape;return !x||x==="original"?"auto":x};
 
 /* ===== COLOR PALETTE (admin) ===== */
@@ -658,9 +665,9 @@ if(!reduce){
 let PW="";
 const TEXT=[["name","Your name"],["logo","Logo","image"],["logoShape","Logo shape","shape"],["heroVideo","Top video (4:3, always plays)","video"],["title","Main headline"],["nameColor","Name color (headline)","color"],["accentColor","Stats & tools color (Pr/Ae/Ps, views, CTR)","color"],["sub","Intro text"],["ctaA","Button 1 text"],["ctaB","Button 2 text"],["navCta","Top bar button text"],["chTitle","Channels title"],["chSub","Channels text"],["workTitle","Work title"],["workSub","Work text"],["resTitle","Results title"],["resSub","Results text"],["rvTitle","Reviews title"],["rvSub","Reviews text"],["ratingValue","Average rating number"],["ratingClients","Happy clients number"],["cTitle","Contact title"],["cSub","Contact text"],["cLabel","Contact button text"],["cLink","Contact button link"],["email","Email"],["instagram","Instagram link"]];
 const LISTS={
-  floaters:["Floating numbers (max 4)","Big number + label, e.g. 731.5K+ and Total views",["value","label"]],
-  shorts:["Short videos","Upload a video file, or paste a link (YouTube, Instagram, TikTok, Facebook, Vimeo, Google Drive, Loom…)",["title","type","src"]],
-  long:["Long videos","Same as short videos",["title","type","src"]],
+  floaters:["Floating numbers (max 4)","Big number + label, e.g. 731.5K+ and Total views. The box labelled “Avg CTR” is calculated automatically from your videos’ CTR.",["value","label"]],
+  shorts:["Short videos","Upload a video file, or paste a link (YouTube, Instagram, TikTok, Facebook, Vimeo, Google Drive, Loom…). Add each video’s CTR % and the Avg CTR box updates by itself.",["title","type","src","ctr"]],
+  long:["Long videos","Same as short videos",["title","type","src","ctr"]],
   channels:["Worked with (channels)","Upload each channel's logo",["name","subs","link","img"]],
   results:["Results","",["value","title","text"]],
   reviews:["Reviews","Photo is optional",["quote","name","role","img"]],

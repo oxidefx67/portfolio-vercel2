@@ -414,8 +414,50 @@ h1{background:var(--nameC,#ff1f3d);-webkit-background-clip:text;background-clip:
 /* per-video CTR */
 .vctr{margin-top:10px;text-align:center;font-size:.85rem;color:var(--mute)}
 .vctr b{color:var(--accC,#ff1f3d);font-weight:700}
+
+/* ===== LOADING SCREEN: your name fills up like liquid ===== */
+#loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:0 4vw;background:radial-gradient(120% 90% at 50% 40%,#2a0509 0%,#050203 70%);transition:opacity .8s ease,visibility .8s}
+#loader.done{opacity:0;visibility:hidden;pointer-events:none}
+#loader .ldname{position:relative;max-width:94vw;text-align:center;font-family:"Gokure",var(--display);font-weight:400;font-synthesis:none;font-size:clamp(2.6rem,10vw,7rem);line-height:1.12;letter-spacing:.01em;filter:url(#liquid);transition:transform .8s cubic-bezier(.2,.7,.2,1),opacity .8s ease}
+#loader.done .ldname{transform:scale(1.12);opacity:0}
+#loader .ldname span{display:block}
+#loader .ldname .b{color:transparent;-webkit-text-stroke:1.5px rgba(255,42,61,.45)}
+#loader .ldname .f{position:absolute;left:0;top:0;width:100%;color:var(--nameC,#ff1f3d);text-shadow:0 0 24px var(--nameGlow,rgba(255,31,61,.5));-webkit-mask-image:linear-gradient(to top,#000 0,#000 var(--lp,0%),transparent calc(var(--lp,0%) + 14%));mask-image:linear-gradient(to top,#000 0,#000 var(--lp,0%),transparent calc(var(--lp,0%) + 14%))}
+#loader .ldp{font:700 .8rem/1 var(--font,sans-serif);letter-spacing:.4em;padding-left:.4em;color:#ff2a3d}
+body.loading{overflow:hidden}
+/* content slides in once the loader lifts */
+@keyframes ldUp{from{opacity:0;transform:translateY(24px)}}
+@keyframes ldDown{from{opacity:0;transform:translateY(-18px)}}
+body.ready nav{animation:ldDown .8s ease backwards}
+body.ready #home>*{animation:ldUp .9s cubic-bezier(.2,.7,.2,1) backwards}
+body.ready #home>*:nth-child(1){animation-delay:.05s}
+body.ready #home>*:nth-child(2){animation-delay:.15s}
+body.ready #home>*:nth-child(3){animation-delay:.25s}
+body.ready #home>*:nth-child(n+4){animation-delay:.35s}
 </style></head>
-<body>
+<body class="loading">
+<div id="loader" role="status" aria-label="Loading"><div class="ldname"><span class="b" id="ldB"></span><span class="f" id="ldF" aria-hidden="true"></span></div><div class="ldp"><b id="ldNum">0</b>%</div></div>
+<noscript><style>#loader{display:none}body.loading{overflow:auto}</style></noscript>
+<script>
+(function(){
+  var t0=Date.now(),fin=false,done=false,p=0,F=document.getElementById("ldF"),B=document.getElementById("ldB"),N=document.getElementById("ldNum"),L=document.getElementById("loader");
+  try{var lt=localStorage.getItem("lt"),lc=localStorage.getItem("lc");if(lt){B.textContent=lt;F.textContent=lt}if(lc)document.documentElement.style.setProperty("--nameC",lc)}catch(e){}
+  window.__setLoaderName=function(t,c){if(t!=null){B.textContent=t;F.textContent=t}try{localStorage.setItem("lt",t||"");if(c)localStorage.setItem("lc",c)}catch(e){}};
+  function paint(){F.style.setProperty("--lp",(p*1.14-14).toFixed(1)+"%");N.textContent=Math.round(p)}
+  function reveal(){if(done)return;done=true;window.__ready=true;L.classList.add("done");document.body.classList.remove("loading");document.body.classList.add("ready");setTimeout(function(){L.remove()},1000)}
+  function frame(){
+    if(done)return;
+    var el=Date.now()-t0,tgt=fin?100:88*(1-Math.exp(-el/1400));
+    p+=(tgt-p)*(fin?.14:.07);if(fin&&p>99.4)p=100;
+    paint();
+    if(p>=100){setTimeout(reveal,420);return}
+    requestAnimationFrame(frame);
+  }
+  window.__hideLoader=function(force){fin=true;if(force){p=100;setTimeout(reveal,700)}};
+  setTimeout(function(){window.__hideLoader(true)},6000);
+  frame();
+})();
+</script>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="liquid" x="-5%" y="-25%" width="110%" height="150%"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="4" result="n"/><feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 
 <nav class="glass">
@@ -490,14 +532,17 @@ const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
 
 async function init(){
   for(const u of ["/api/content","content.json"]){try{const r=await fetch(u,{cache:"no-store"});if(r.ok){const d=await r.json();if(d&&d.name){Object.assign(C,d);break}}}catch(e){}}
+  applyColors();if(window.__setLoaderName)window.__setLoaderName(C.title,document.documentElement.style.getPropertyValue("--nameC"));
   render();setTab(tab,false);checkAdmin();
+  Promise.all([document.fonts?document.fonts.ready:0,new Promise(r=>document.readyState==="complete"?r():addEventListener("load",r))]).then(()=>window.__hideLoader&&window.__hideLoader(),()=>window.__hideLoader&&window.__hideLoader(true));
 }
 const T=(id,k)=>{$(id).textContent=C[k]};
 function sec(id,list,t,s){$("#"+id).hidden=!list.length;const h=$("#"+id).querySelectorAll("h2,.sub");h[0].textContent=C[t];h[1].textContent=C[s]}
 function count(el,txt){
   const m=String(txt).match(/[\d.]+/);if(!m||reduce){el.textContent=txt;return}
-  const n=parseFloat(m[0]),d=(m[0].split(".")[1]||"").length,pre=txt.slice(0,m.index),post=txt.slice(m.index+m[0].length),t0=performance.now();
-  (function f(t){const k=Math.min(1,(t-t0)/1400),e=1-Math.pow(1-k,3);el.textContent=pre+(n*e).toFixed(d)+post;if(k<1)requestAnimationFrame(f)})(t0);
+  const n=parseFloat(m[0]),d=(m[0].split(".")[1]||"").length,pre=txt.slice(0,m.index),post=txt.slice(m.index+m[0].length);
+  el.textContent=pre+(0).toFixed(d)+post;
+  (function w(){if(!window.__ready){requestAnimationFrame(w);return}const t0=performance.now();(function f(t){const k=Math.min(1,(t-t0)/1400),e=1-Math.pow(1-k,3);el.textContent=pre+(n*e).toFixed(d)+post;if(k<1)requestAnimationFrame(f)})(t0)})();
 }
 function render(){
   document.title=C.name+" | Video Editor";applyColors();

@@ -429,9 +429,20 @@ body.loading .tree.r{transform:translateX(calc((1 - var(--pgR,1)) * 115vw)) scal
 body.loading .scene{transform:translateY(calc((1 - var(--pgS,1)) * 110%))}
 /* branches sway, flowers bloom, sun rises (driven by the loader) */
 @keyframes swayA{0%,100%{transform:rotate(calc(var(--amp,1.4deg) * -1))}50%{transform:rotate(var(--amp,1.4deg))}}
-.tree .sw{transform-box:view-box;transform-origin:var(--ox,0px) var(--oy,30px);animation:swayA var(--dur,6s) ease-in-out infinite;animation-delay:var(--dl,0s)}
 .tree .bl{--k:clamp(0,calc((var(--bloom,1) - var(--t,0)) / .3),1);transform-box:fill-box;transform-origin:center;transform:scale(var(--k)) rotate(calc((1 - var(--k)) * -70deg))}
 .scene .sunc{transform:translateY(calc((1 - var(--sun,1)) * 210px))}
+/* ===== PERFORMANCE ===== */
+.tree{aspect-ratio:4/3;height:auto}
+.tl{position:absolute;inset:0;transform-origin:var(--ox,0%) var(--oy,10%);animation:swayA var(--dur,6s) ease-in-out infinite;animation-delay:var(--dl,0s);will-change:transform}
+.tl>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+body.ready .tree .bl{transform:none}
+h1{filter:url(#liquid) drop-shadow(0 0 12px var(--nameGlow,rgba(255,31,61,.4)))}
+@media(hover:none){h1{filter:url(#liquid)}}
+body.loading .scene{will-change:transform}
+.glass,nav.glass{-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.tools i,.ch em{-webkit-backdrop-filter:none;backdrop-filter:none}
+.stage .fls .fl{-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:inset 0 1.5px 1px rgba(255,255,255,.35),0 6px 16px rgba(0,0,0,.5);will-change:transform,opacity;background:linear-gradient(135deg,rgba(70,6,16,.82),rgba(24,2,8,.86))}
+@media(max-width:700px){.glass,nav.glass{-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}}
 body.loading{overflow:hidden}
 body.loading>:not(#loader):not(script):not(style):not(noscript):not(svg):not(canvas):not(.sun){visibility:hidden}
 /* while loading, only the real background (trees, Fuji, petals) shows, so the hand-off is seamless */
@@ -473,7 +484,7 @@ body.ready #home>*:nth-child(n+4){animation-delay:.35s}
   frame();
 })();
 </script>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="liquid" x="-5%" y="-25%" width="110%" height="150%"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="2" seed="4" result="n"/><feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="liquid" x="-5%" y="-25%" width="110%" height="150%"><feTurbulence id="turb" type="fractalNoise" baseFrequency="0.012 0.02" numOctaves="1" seed="4" result="n"/><feDisplacementMap id="disp" in="SourceGraphic" in2="n" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></svg>
 
 <nav class="glass">
   <a class="brand" href="#home"><span id="logoSlot"></span><span class="n" id="navName"></span></a>
@@ -714,15 +725,19 @@ function applyColors(){
 }
 $("#panel").addEventListener("input",e=>{const t=e.target;if(t.type==="color"&&t.dataset.t){C[t.dataset.t]=t.value;applyColors()}});
 
-/* ===== LIQUID TYPE EFFECT on the headline ===== */
+/* ===== LIQUID TYPE EFFECT on the headline (throttled, runs only while visible) ===== */
 if(!reduce){
-  const turb=$("#turb"),disp=$("#disp"),h=$("#title"),touch=matchMedia("(hover:none)").matches,base=touch?3:4,hot=touch?12:46,press=touch?18:70;let cur=base,target=base,t=0;
-  const hit=(x,y)=>{const r=h.getBoundingClientRect();return x>r.left-30&&x<r.right+30&&y>r.top-30&&y<r.bottom+30};
-  addEventListener("pointermove",e=>{target=hit(e.clientX,e.clientY)?hot:base},{passive:true});
+  const turb=$("#turb"),disp=$("#disp"),h=$("#title"),touch=matchMedia("(hover:none)").matches,base=touch?3:4,hot=touch?12:46,press=touch?18:70,idleGap=touch?200:110,actGap=touch?66:40;
+  let cur=base,target=base,t=0,last=0,vis=true,px=-1,py=-1,sc=0;
+  addEventListener("scroll",()=>{sc=performance.now()},{passive:true});
+  new IntersectionObserver(e=>{vis=e[0].isIntersecting},{rootMargin:"80px"}).observe(h);
+  addEventListener("pointermove",e=>{px=e.clientX;py=e.clientY},{passive:true});
   h.addEventListener("pointerdown",()=>{target=press});addEventListener("pointerup",()=>{if(touch)target=base});
-  (function loop(){t+=.012;cur+=(target-cur)*.07;
+  (function loop(ts){requestAnimationFrame(loop);if(!vis||ts-sc<120||ts-last<((target!==base||Math.abs(target-cur)>.4)?actGap:idleGap))return;const dt=Math.min(.1,(ts-last)/1000);last=ts;
+    if(px>=0){const r=h.getBoundingClientRect();target=(px>r.left-30&&px<r.right+30&&py>r.top-30&&py<r.bottom+30)?hot:base;px=-1}
+    t+=.72*dt;cur+=(target-cur)*(1-Math.pow(.93,dt*60));
     turb.setAttribute("baseFrequency",(.012+Math.sin(t)*.005).toFixed(4)+" "+(.02+Math.cos(t*.8)*.008).toFixed(4));
-    disp.setAttribute("scale",cur.toFixed(1));requestAnimationFrame(loop)})();
+    disp.setAttribute("scale",cur.toFixed(1))})(0);
 }
 
 /* ===== ADMIN PANEL ===== */
@@ -818,34 +833,37 @@ init();
   const rnd=a=>a[Math.floor(Math.random()*a.length)];
   function flower(par,x,y){
     const o=document.createElementNS(NS,"g"),s=1+Math.random()*.7,c=rnd(pal);
-    o.setAttribute("transform",`translate(${x} ${y}) scale(${s}) rotate(${Math.random()*72})`);
+    o.setAttribute("transform",`translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${s.toFixed(2)}) rotate(${(Math.random()*72).toFixed(0)})`);
     const g=document.createElementNS(NS,"g");g.setAttribute("class","bl");g.style.setProperty("--t",(Math.random()*.7).toFixed(2));o.appendChild(g);
-    for(let k=0;k<5;k++){const e=document.createElementNS(NS,"circle"),a=k*1.2566;e.setAttribute("cx",Math.cos(a)*4.6);e.setAttribute("cy",Math.sin(a)*4.6);e.setAttribute("r",4.3);e.setAttribute("fill",c);e.setAttribute("opacity",".93");g.appendChild(e)}
+    let d="";for(let k=0;k<5;k++){const a=k*1.2566,cx=Math.cos(a)*4.6,cy=Math.sin(a)*4.6;d+=`M${(cx-4.3).toFixed(2)},${cy.toFixed(2)}a4.3,4.3 0 1,0 8.6,0a4.3,4.3 0 1,0 -8.6,0`}
+    const pe=document.createElementNS(NS,"path");pe.setAttribute("d",d);pe.setAttribute("fill",c);pe.setAttribute("fill-opacity",".93");g.appendChild(pe);
     const m=document.createElementNS(NS,"circle");m.setAttribute("r",1.7);m.setAttribute("fill","#ff2a3d");g.appendChild(m);par.appendChild(o);
   }
   function tree(cls){
-    const svg=document.createElementNS(NS,"svg");svg.setAttribute("viewBox","0 0 400 300");svg.setAttribute("class","tree "+cls);svg.setAttribute("aria-hidden","true");document.body.appendChild(svg);
-    const P=["M-10,30 C90,50 150,20 230,80 S330,150 380,140","M120,40 C150,90 140,140 170,190","M230,80 C260,40 300,40 340,20","M300,118 C320,170 300,210 330,250"],W=[9,5,5,4],O=[[-10,30],[120,40],[230,80],[300,118]];
-    const grp=(par,i)=>{const g=document.createElementNS(NS,"g");g.setAttribute("class","sw");
-      g.style.setProperty("--ox",O[i][0]+"px");g.style.setProperty("--oy",O[i][1]+"px");g.style.setProperty("--amp",(i?2.4:1.1)+"deg");
-      g.style.setProperty("--dur",(5.5+i*1.3+Math.random()*1.5).toFixed(2)+"s");g.style.setProperty("--dl",(-Math.random()*6).toFixed(2)+"s");par.appendChild(g);return g};
-    const main=grp(svg,0),G=P.map((d,i)=>i?grp(main,i):main),paths=P.map((d,i)=>{const p=document.createElementNS(NS,"path");p.setAttribute("d",d);p.setAttribute("fill","none");p.setAttribute("stroke","#8a1f30");p.setAttribute("stroke-width",W[i]);p.setAttribute("stroke-linecap","round");G[i].appendChild(p);return p});
-    paths.forEach((p,i)=>{const L=p.getTotalLength();for(let s=L*.12;s<L;s+=12){const pt=p.getPointAtLength(s);flower(G[i],pt.x+(Math.random()-.5)*30,pt.y+(Math.random()-.5)*30)}});
+    const root=document.createElement("div");root.className="tree "+cls;root.setAttribute("aria-hidden","true");document.body.appendChild(root);
+    const P=["M-10,30 C90,50 150,20 230,80 S330,150 380,140","M120,40 C150,90 140,140 170,190","M230,80 C260,40 300,40 340,20","M300,118 C320,170 300,210 330,250"],W=[9,5,5,4],O=[[-10,30],[120,40]],step=innerWidth<700?16:12;
+    const layer=(par,i)=>{const d=document.createElement("div");d.className="tl";
+      d.style.setProperty("--ox",(O[i][0]/4).toFixed(1)+"%");d.style.setProperty("--oy",(O[i][1]/3).toFixed(1)+"%");d.style.setProperty("--amp",(i?1.7:1.1)+"deg");
+      d.style.setProperty("--dur",(5.5+i*1.3+Math.random()*1.5).toFixed(2)+"s");d.style.setProperty("--dl",(-Math.random()*6).toFixed(2)+"s");par.appendChild(d);
+      const svg=document.createElementNS(NS,"svg");svg.setAttribute("viewBox","0 0 400 300");d.appendChild(svg);return[d,svg]};
+    const main=layer(root,0),sub=layer(main[0],1),L=P.map((d,i)=>i?sub:main);
+    P.forEach((d,i)=>{const svg=L[i][1],p=document.createElementNS(NS,"path");p.setAttribute("d",d);p.setAttribute("fill","none");p.setAttribute("stroke","#8a1f30");p.setAttribute("stroke-width",W[i]);p.setAttribute("stroke-linecap","round");svg.appendChild(p);
+      const len=p.getTotalLength();for(let q=len*.12;q<len;q+=step){const pt=p.getPointAtLength(q);flower(svg,pt.x+(Math.random()-.5)*30,pt.y+(Math.random()-.5)*30)}});
   }
   tree("l");tree("r");
 
   const cv=document.getElementById("petals"),cx=cv.getContext("2d");let w,h;
-  function size(){const d=Math.min(2,devicePixelRatio||1);w=innerWidth;h=innerHeight;cv.width=w*d;cv.height=h*d;cx.setTransform(d,0,0,d,0,0)}
+  let D=1;function size(){const d=D=Math.min(1.5,devicePixelRatio||1);w=innerWidth;h=innerHeight;cv.width=w*d;cv.height=h*d;cx.setTransform(d,0,0,d,0,0)}
   size();addEventListener("resize",size);
+  const SPR=document.createElement("canvas");SPR.width=SPR.height=64;{const q=SPR.getContext("2d"),S=28;q.translate(32,32);q.fillStyle="#fff";q.beginPath();q.moveTo(0,-S);q.bezierCurveTo(S*.95,-S*.6,S*.7,S*.8,0,S);q.bezierCurveTo(-S*.7,S*.8,-S*.95,-S*.6,0,-S);q.fill()}
   const mk=init=>({x:Math.random()*w,y:init?Math.random()*h:-20,s:(6+Math.random()*8)*(w<600?.45:1),vy:.5+Math.random()*1,sw:Math.random()*6.28,sp:.01+Math.random()*.02,r:Math.random()*6.28,vr:(Math.random()-.5)*.04,a:.55+Math.random()*.4});
   const ps=Array.from({length:innerWidth<600?26:46},()=>mk(true));
   addEventListener('click',e=>{const t=e.target.closest&&e.target.closest('a,button,summary');if(!t||t.closest('#admin')||ps.length>140)return;const r=t.getBoundingClientRect();for(let i=0;i<14;i++){const p=mk(false);p.b=true;p.x=r.left+r.width/2+(Math.random()-.5)*r.width*.6;p.y=r.top+r.height/2;p.vy=-1.5-Math.random()*3.5;p.sw=Math.random()*6;p.s=(5+Math.random()*6)*(w<600?.5:1);p.a=.95;ps.push(p)}});
   function draw(move){
-    cx.clearRect(0,0,w,h);
+    cx.setTransform(1,0,0,1,0,0);cx.clearRect(0,0,cv.width,cv.height);
     ps.forEach(p=>{
       if(move){if(p.b)p.vy+=.045;p.y+=p.vy;p.sw+=p.sp;p.x+=Math.sin(p.sw)*.8+.6;p.r+=p.vr;if(p.y>h+20||p.x>w+30){if(p.b){ps.splice(ps.indexOf(p),1);return}p.y=-20;p.x=Math.random()*w-w*.2}}
-      cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.globalAlpha=p.a;cx.fillStyle="#ffffff";
-      const s=p.s;cx.beginPath();cx.moveTo(0,-s);cx.bezierCurveTo(s*.95,-s*.6,s*.7,s*.8,0,s);cx.bezierCurveTo(-s*.7,s*.8,-s*.95,-s*.6,0,-s);cx.fill();cx.restore();
+      {const co=Math.cos(p.r)*D,si=Math.sin(p.r)*D,k=p.s*1.143;cx.setTransform(co,si,-si,co,p.x*D,p.y*D);cx.globalAlpha=p.a;cx.drawImage(SPR,-k,-k,2*k,2*k)}
     });
     if(move)requestAnimationFrame(()=>draw(true));
   }
@@ -879,24 +897,31 @@ init();
 })();
 </script>
 <script>
-/* ===== STATS ORBIT AROUND THE NAME ===== */
+/* ===== STATS ORBIT AROUND THE NAME (cached sizes, only while visible) ===== */
 (function(){
   const stage=document.querySelector(".stage"),box=document.getElementById("fls");if(!stage||!box)return;
   const still=matchMedia("(prefers-reduced-motion:reduce)").matches;
-  let a0=0,last=performance.now();
+  let a0=0,last=performance.now(),vis=true,W=0,H=0,S=[],Z=[];
+  function measure(){W=stage.clientWidth;H=stage.clientHeight;S=[...stage.querySelectorAll(".fl")].map(el=>[el.offsetWidth,el.offsetHeight])}
   function place(){
     const fl=stage.querySelectorAll(".fl"),n=fl.length;if(!n)return;
-    const W=stage.clientWidth,H=stage.clientHeight;
+    if(S.length!==n)measure();
     fl.forEach((el,i)=>{
-      const w=el.offsetWidth,h=el.offsetHeight,rx=Math.max(20,W/2-w/2-6),ry=Math.max(20,H/2-h/2-4);
-      const a=a0+i*2*Math.PI/n,d=(Math.sin(a)+1)/2;
+      const w=S[i][0],h=S[i][1],rx=Math.max(20,W/2-w/2-6),ry=Math.max(20,H/2-h/2-4);
+      const a=a0+i*2*Math.PI/n,d=(Math.sin(a)+1)/2,z=d>.5?2:0;
       el.style.transform="translate(-50%,-50%) translate("+(Math.cos(a)*rx).toFixed(1)+"px,"+(Math.sin(a)*ry).toFixed(1)+"px) scale("+(.82+.26*d).toFixed(3)+")";
-      el.style.opacity=(.55+.45*d).toFixed(2);el.style.zIndex=d>.5?2:0;
+      el.style.opacity=(.55+.45*d).toFixed(2);if(Z[i]!==z){Z[i]=z;el.style.zIndex=z}
     });
   }
-  function loop(t){const dt=Math.min(.05,(t-last)/1000);last=t;a0+=dt*.3;place();requestAnimationFrame(loop)}
-  place();addEventListener("resize",place);
-  new MutationObserver(place).observe(box,{childList:true});
+  function loop(t){requestAnimationFrame(loop);const dt=Math.min(.05,(t-last)/1000);last=t;if(!vis)return;a0+=dt*.3;place()}
+  measure();place();addEventListener("resize",()=>{measure();place()});
+  new MutationObserver(()=>{measure();place()}).observe(box,{childList:true});
+  setInterval(measure,1500);
+  if("IntersectionObserver" in window){
+    new IntersectionObserver(e=>{vis=e[0].isIntersecting}).observe(stage);
+    const hv=document.querySelector(".banner video");
+    if(hv)new IntersectionObserver(e=>{if(e[0].isIntersecting)hv.play().catch(()=>{});else hv.pause()}).observe(hv);
+  }
   if(!still)requestAnimationFrame(loop);
 })();
 </script>

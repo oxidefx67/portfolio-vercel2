@@ -416,15 +416,23 @@ h1{background:var(--nameC,#ff1f3d);-webkit-background-clip:text;background-clip:
 .vctr b{color:var(--accC,#ff1f3d);font-weight:700}
 
 /* ===== LOADING SCREEN: your name fills up like liquid ===== */
-#loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:0 4vw;background:radial-gradient(120% 90% at 50% 40%,#2a0509 0%,#050203 70%);transition:opacity .8s ease,visibility .8s}
+#loader{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:0 4vw;background:none;transition:opacity .8s ease,visibility .8s}
 #loader.done{opacity:0;visibility:hidden;pointer-events:none}
 #loader .ldname{position:relative;max-width:94vw;text-align:center;font-family:"Gokure",var(--display);font-weight:400;font-synthesis:none;font-size:clamp(2.6rem,10vw,7rem);line-height:1.12;letter-spacing:.01em;filter:url(#liquid);transition:transform .8s cubic-bezier(.2,.7,.2,1),opacity .8s ease}
 #loader.done .ldname{transform:scale(1.12);opacity:0}
 #loader .ldname span{display:block}
 #loader .ldname .b{color:transparent;-webkit-text-stroke:1.5px rgba(255,42,61,.45)}
 #loader .ldname .f{position:absolute;left:0;top:0;width:100%;color:var(--nameC,#ff1f3d);text-shadow:0 0 24px var(--nameGlow,rgba(255,31,61,.5));-webkit-mask-image:linear-gradient(to top,#000 0,#000 var(--lp,0%),transparent calc(var(--lp,0%) + 14%));mask-image:linear-gradient(to top,#000 0,#000 var(--lp,0%),transparent calc(var(--lp,0%) + 14%))}
-#loader .ldp{font:700 .8rem/1 var(--font,sans-serif);letter-spacing:.4em;padding-left:.4em;color:#ff2a3d}
+/* background slides in while loading: trees from the sides, mountain + gate from below */
+body.loading .tree.l{transform:translateX(calc((1 - var(--pgL,1)) * -115vw))}
+body.loading .tree.r{transform:translateX(calc((1 - var(--pgR,1)) * 115vw)) scaleX(-1)}
+body.loading .scene{transform:translateY(calc((1 - var(--pgS,1)) * 110%))}
 body.loading{overflow:hidden}
+body.loading>:not(#loader):not(script):not(style):not(noscript):not(svg):not(canvas):not(.sun){visibility:hidden}
+/* while loading, only the real background (trees, Fuji, petals) shows, so the hand-off is seamless */
+body.loading :is(nav,header,section,footer){opacity:0}
+@keyframes ldFade{from{opacity:0}}
+body.ready :is(section,footer){animation:ldFade .9s ease backwards}
 /* content slides in once the loader lifts */
 @keyframes ldUp{from{opacity:0;transform:translateY(24px)}}
 @keyframes ldDown{from{opacity:0;transform:translateY(-18px)}}
@@ -434,16 +442,18 @@ body.ready #home>*:nth-child(1){animation-delay:.05s}
 body.ready #home>*:nth-child(2){animation-delay:.15s}
 body.ready #home>*:nth-child(3){animation-delay:.25s}
 body.ready #home>*:nth-child(n+4){animation-delay:.35s}
+.node small{display:block;width:150px;margin:2px -39px 0;text-align:center;font-size:.74rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--accC,#ff1f3d)}
 </style></head>
 <body class="loading">
-<div id="loader" role="status" aria-label="Loading"><div class="ldname"><span class="b" id="ldB"></span><span class="f" id="ldF" aria-hidden="true"></span></div><div class="ldp"><b id="ldNum">0</b>%</div></div>
+<div id="loader" role="status" aria-label="Loading"><div class="ldname"><span class="b" id="ldB"></span><span class="f" id="ldF" aria-hidden="true"></span></div></div>
 <noscript><style>#loader{display:none}body.loading{overflow:auto}</style></noscript>
 <script>
 (function(){
-  var t0=Date.now(),fin=false,done=false,p=0,F=document.getElementById("ldF"),B=document.getElementById("ldB"),N=document.getElementById("ldNum"),L=document.getElementById("loader");
+  var t0=Date.now(),fin=false,done=false,p=0,F=document.getElementById("ldF"),B=document.getElementById("ldB"),L=document.getElementById("loader");
   try{var lt=localStorage.getItem("lt"),lc=localStorage.getItem("lc");if(lt){B.textContent=lt;F.textContent=lt}if(lc)document.documentElement.style.setProperty("--nameC",lc)}catch(e){}
   window.__setLoaderName=function(t,c){if(t!=null){B.textContent=t;F.textContent=t}try{localStorage.setItem("lt",t||"");if(c)localStorage.setItem("lc",c)}catch(e){}};
-  function paint(){F.style.setProperty("--lp",(p*1.14-14).toFixed(1)+"%");N.textContent=Math.round(p)}
+  var RM=matchMedia("(prefers-reduced-motion:reduce)").matches,R=document.documentElement.style;
+  function paint(){F.style.setProperty("--lp",(p*1.14-14).toFixed(1)+"%");var q=RM?1:p/100;R.setProperty("--pgL",q.toFixed(3));R.setProperty("--pgR",Math.pow(q,1.25).toFixed(3));R.setProperty("--pgS",Math.pow(q,1.6).toFixed(3))}
   function reveal(){if(done)return;done=true;window.__ready=true;L.classList.add("done");document.body.classList.remove("loading");document.body.classList.add("ready");setTimeout(function(){L.remove()},1000)}
   function frame(){
     if(done)return;
@@ -572,7 +582,7 @@ function render(){
 let lastW=0;
 function ribbon(){
   const box=$("#chList"),L=C.channels,n=L.length;box.className="rib";lastW=innerWidth;
-  const W=Math.max(innerWidth-40,n*190+120),H=250,cy=120,e=Math.min(130,W*.2);
+  const W=Math.max(innerWidth-40,n*190+120),H=280,cy=120,e=Math.min(130,W*.2);
   const y=x=>cy+44*Math.sin(x/95)+14*Math.sin(x/37+1);
   const path=(a,b)=>{let d="";for(let x=a;x<=b;x+=6)d+=(d?"L":"M")+x+","+y(x).toFixed(1);return d};
   const seg=(a,b,c)=>`<path d="${path(a,b)}" fill="none" stroke="${c}" stroke-width="20" stroke-linecap="butt" stroke-linejoin="round"/>`;
@@ -585,7 +595,7 @@ function ribbon(){
   for(let i=0;i<n-1;i++)svg+=patch((X(i)+X(i+1))/2);
   if(n<2)svg+=patch(W/2+120);
   svg+=fringe(16,-1)+fringe(W-16,1)+"</svg>";
-  const nodes=L.map((c,i)=>{const x=X(i);return `<a class="node" href="${esc(c.link)}" target="_blank" rel="noopener" title="${esc(c.subs)}" style="left:${x-36}px;top:${(y(x)-36).toFixed(1)}px"><div class="av">${c.img?`<img alt="" src="${esc(c.img)}">`:esc((c.name||"?").charAt(0))}</div><b>${esc(c.name)}</b></a>`}).join("");
+  const nodes=L.map((c,i)=>{const x=X(i);return `<a class="node" href="${esc(chLink(c))}" target="_blank" rel="noopener" title="${esc(c.subs)}" style="left:${x-36}px;top:${(y(x)-36).toFixed(1)}px"><div class="av">${c.img?`<img alt="" src="${esc(c.img)}">`:esc((c.name||"?").charAt(0))}</div><b>${esc(c.name)}</b>${c.subs?`<small>${esc(/sub/i.test(c.subs)?c.subs:c.subs+" subscribers")}</small>`:""}</a>`}).join("");
   box.innerHTML=`<div class="rin" style="width:${W}px;height:${H}px">${svg}${nodes}</div>`;
 }
 (function(){
@@ -682,6 +692,10 @@ function vrow(k,i,o){
 const ctrNum=v=>{const t=String(v==null?"":v).trim();if(!t)return null;const n=parseFloat(t.replace(",",".").replace(/[^\d.]/g,""));return isFinite(n)?n:null};
 const fmtCtr=(n,d)=>(+n.toFixed(d)).toString()+"%";
 function avgCtr(){const a=[...C.shorts,...C.long].map(v=>ctrNum(v.ctr)).filter(x=>x!==null);return a.length?a.reduce((p,q)=>p+q,0)/a.length:null}
+function normYT(u){let t=String(u||"").trim();if(!t)return "https://www.youtube.com";if(t[0]==="@")return "https://www.youtube.com/"+t;if(/^UC[\w-]{20,}$/.test(t))return "https://www.youtube.com/channel/"+t;if(/^[\w-]+$/.test(t))return "https://www.youtube.com/@"+t;if(!/^https?:\/\//i.test(t))t="https://"+t.replace(/^\/\//,"");return t}
+const chLink=c=>normYT(c.link&&!/^https?:\/\/(www\.)?youtube\.com\/?$/i.test(String(c.link).trim())?c.link:(c.src||c.link));
+const CHPH={name:"Channel name",subs:"Subscribers (e.g. 1.2M)",link:"Channel link (youtube.com/@yourchannel)",img:"Channel logo (tap Upload)"};
+const chStatus=o=>{const raw=String(o.link||"").trim();if(!raw||/^(https?:\/\/)?(www\.)?youtube\.com\/?$/i.test(raw))return "⚠ This opens the YouTube homepage. Paste your channel link, e.g. youtube.com/@yourchannel";return "✓ Opens: "+chLink(o).replace(/^https?:\/\/(www\.)?/,"")};
 const shp=()=>{const x=C.logoShape;return !x||x==="original"?"auto":x};
 
 /* ===== COLOR PALETTE (admin) ===== */
@@ -725,7 +739,7 @@ const shapeSel=t=>`<div class="lb"><span>${t[1]}</span><select data-t="${t[0]}">
 function row(k,i,o){if(k==="shorts"||k==="long")return vrow(k,i,o);return `<div class="it" data-k="${k}" data-i="${i}">`+LISTS[k][2].map(f=>{
   if(f==="type")return "";
   const u=(UPLOAD[k]||{})[f];
-  return `<div class="f">${u&&u.startsWith("image")&&o[f]?`<img class="pv" alt="" src="${esc(o[f])}">`:""}<input data-f="${f}" placeholder="${f==="src"&&u?"Paste a YouTube link, or tap Upload":f}" value="${esc(f==="src"&&o.type==="youtube"?"https://youtu.be/"+o.src:o[f])}">${u?`<button class="btn light sm" data-up="${u}">Upload</button>`:""}</div>`}).join("")+`<button class="btn light sm" data-del>Remove</button></div>`}
+  return `<div class="f">${u&&u.startsWith("image")&&o[f]?`<img class="pv" alt="" src="${esc(o[f])}">`:""}<input data-f="${f}" placeholder="${f==="src"&&u?"Paste a YouTube link, or tap Upload":(k==="channels"&&CHPH[f])||f}" value="${esc(f==="src"&&o.type==="youtube"?"https://youtu.be/"+o.src:o[f])}">${u?`<button class="btn light sm" data-up="${u}">Upload</button>`:""}</div>`}).join("")+(k==="channels"?`<small class="vst">${esc(chStatus(o))}</small>`:"")+`<button class="btn light sm" data-del>Remove</button></div>`}
 function openAdmin(){
   $("#panel").innerHTML=`<h3>Site manager</h3><p class="n">Change anything, then press Save to website. It goes live for everyone with no GitHub step. Empty lists hide their section.</p><h4>Basics</h4>`+
     TEXT.map(t=>t[2]==="shape"?shapeSel(t):t[2]==="color"?colorSel(t):`<div class="lb"><span>${t[1]}</span><div class="f"><input data-t="${t[0]}" value="${esc(C[t[0]])}">${t[2]?`<button class="btn light sm" data-up="${t[2]}/*">Upload</button>`:""}</div></div>`).join("")+
@@ -747,12 +761,12 @@ async function save(){
 $("#panel").addEventListener("change",e=>{
   const t=e.target,it=t.closest(".it");
   if(it&&t.dataset.f){const o=C[it.dataset.k][+it.dataset.i],f=t.dataset.f;
-    if(f==="link"){const v=t.value.trim();
+    if(f==="link"&&(it.dataset.k==="shorts"||it.dataset.k==="long")){const v=t.value.trim();
       if(!v){if(o.type!=="file"){o.type="file";o.src=""}}
       else{const id=ytId(v);if(id){o.type="youtube";o.src=id;t.value="https://youtu.be/"+id}else{o.type="link";o.src=/^https?:\/\//i.test(v)?v:"https://"+v.replace(/^\/\//,"");t.value=o.src}}
       const st=it.querySelector(".vst");if(st)st.textContent=vstatus(o)}
     else if(f==="src"&&(it.dataset.k==="shorts"||it.dataset.k==="long")){const id=ytId(t.value);if(id){o.type="youtube";o.src=id;t.value="https://youtu.be/"+id}else{o.type="file";o.src=t.value}}
-    else o[f]=t.value;
+    else{o[f]=t.value;if(it.dataset.k==="channels"){const st=it.querySelector(".vst");if(st)st.textContent=chStatus(o)}}
     refresh()}
   else if(t.dataset.t){C[t.dataset.t]=t.value;refresh()}
 });
